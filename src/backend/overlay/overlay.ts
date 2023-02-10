@@ -96,6 +96,7 @@ class Application {
   public addOverlayWindow(
     name: string,
     window: Electron.BrowserWindow,
+    poistion: { x: number; y: number },
     dragborder = 0,
     captionHeight = 0,
     transparent = false
@@ -104,8 +105,8 @@ class Application {
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
 
     const rect = {
-      x: window.getBounds().x,
-      y: window.getBounds().y,
+      x: poistion.x,
+      y: poistion.y,
       width: Math.floor(window.getBounds().width * this.scaleFactor),
       height: Math.floor(window.getBounds().height * this.scaleFactor)
     }
@@ -161,28 +162,32 @@ class Application {
       window.webContents.send('dom-ready')
     })
 
-    window.on('resize', () => {
-      console.log('overlay electron browser window resized')
-      this.Overlay!.sendWindowBounds(window.id, {
-        rect: {
-          x: window.getBounds().x,
-          y: window.getBounds().y,
-          width: Math.floor(window.getBounds().width * this.scaleFactor),
-          height: Math.floor(window.getBounds().height * this.scaleFactor)
-        }
-      })
-    })
+    //do no send this on resize
+    //just use setBounds for BrowserWindow, and sendWindowBounds to overlay-in-game
+    // window.on('resize', () => {
+    //   console.log('overlay electron browser window resized')
+    //   this.Overlay!.sendWindowBounds(window.id, {
+    //     rect: {
+    //       x: window.getBounds().x,
+    //       y: window.getBounds().y,
+    //       width: Math.floor(window.getBounds().width * this.scaleFactor),
+    //       height: Math.floor(window.getBounds().height * this.scaleFactor)
+    //     }
+    //   })
+    // })
 
-    window.on('move', () => {
-      this.Overlay!.sendWindowBounds(window.id, {
-        rect: {
-          x: window.getBounds().x,
-          y: window.getBounds().y,
-          width: Math.floor(window.getBounds().width * this.scaleFactor),
-          height: Math.floor(window.getBounds().height * this.scaleFactor)
-        }
-      })
-    })
+    // do not handle move
+    // just sendWindowBounds to overlay-in-game when you want change its position in game
+    // window.on('move', () => {
+    //   this.Overlay!.sendWindowBounds(window.id, {
+    //     rect: {
+    //       x: window.getBounds().x,
+    //       y: window.getBounds().y,
+    //       width: Math.floor(window.getBounds().width * this.scaleFactor),
+    //       height: Math.floor(window.getBounds().height * this.scaleFactor)
+    //     }
+    //   })
+    // })
 
     const windowId = window.id
     window.on('closed', () => {
@@ -272,9 +277,35 @@ class Application {
         : `file://${path.join(buildDir, './index.html?HyperplayOverlay')}`
     )
 
-    this.addOverlayWindow(name, window, 10, 40)
+    this.addOverlayWindow(name, window, { x: 0, y: 0 }, 10, 40)
     console.log('OSR WINDOW CREATED AND ADDED')
     return window
+  }
+
+  public createNotifictionOverlay() {
+    const options: Electron.BrowserWindowConstructorOptions = {
+      height: 300,
+      width: 600,
+      frame: false,
+      show: false,
+      transparent: true,
+      resizable: false,
+      backgroundColor: '#00000000',
+      webPreferences: {
+        webviewTag: true,
+        offscreen: true,
+        nodeIntegration: true,
+        contextIsolation: true,
+        preload: path.join(__dirname, 'preload.js')
+      }
+    }
+
+    const name = AppWindows.OVERLAY_TIP
+    const window = this.createWindow(name, options)
+
+    window.setPosition(0, 0)
+    window.loadURL('http://localhost:3000/')
+    this.addOverlayWindow(name, window, { x: 100, y: 400 }, 0, 0)
   }
 
   public closeAllWindows() {
@@ -386,6 +417,7 @@ class Application {
       this.startOverlay()
 
       this.createHyperplayOverlay()
+      this.createNotifictionOverlay()
     }
 
     ipcMain.on('startIntercept', () => {

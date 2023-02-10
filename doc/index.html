@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <style>
+      body {
+        background: rgba(0, 0, 0, 0);
+        margin: 0px;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin-left: 40px;
+      }
+
+      .caption {
+        height: 40px;
+      }
+
+      #info {
+        height: 40px;
+        -webkit-transition: background-color 1000ms linear;
+        -ms-transition: background-color 1000ms linear;
+        transition: background-color 1000ms linear;
+      }
+    </style>
+    <title>OsrWindow</title>
+  </head>
+
+  <body>
+    <div class="caption"></div>
+    <button id="button">Button</button>
+    <div id="tip">notify hide</div>
+    <div id="info"></div>
+    <script>
+      const btn = document.getElementById('button')
+      btn.onclick = () => {
+        document.body.style.backgroundColor = '#0000'
+      }
+
+      const info = document.getElementById('info')
+      const tip = document.getElementById('tip')
+      let isNotifyNow = false
+      setInterval(() => {
+        if (!isNotifyNow) {
+          info.style.backgroundColor = '#cf0c'
+          isNotifyNow = true
+          tip.innerText = 'notify show'
+        } else {
+          info.style.backgroundColor = '#0000'
+          isNotifyNow = false
+          tip.innerText = 'notify hide'
+        }
+      }, 3000)
+    </script>
+  </body>
+</html>
