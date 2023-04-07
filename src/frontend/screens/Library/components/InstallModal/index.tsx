@@ -72,6 +72,8 @@ export default React.memo(function InstallModal({
   const [wineVersionList, setWineVersionList] = useState<WineInstallation[]>([])
   const [crossoverBottle, setCrossoverBottle] = useState('')
 
+  const [releaseNameToInstall, setReleaseNameToInstall] = useState('')
+
   const isLinuxNative = Boolean(gameInfo?.is_linux_native)
   const isMacNative = Boolean(gameInfo?.is_mac_native)
 
@@ -189,6 +191,29 @@ export default React.memo(function InstallModal({
     )
   }
 
+  function releaseNameSelection() {
+    return (
+      <SelectField
+        label={`${t('game.selectReleaseName', 'Select Release Name')}:`}
+        htmlId="releaseNameSelect"
+        value={releaseNameToInstall}
+        onChange={(e) => setReleaseNameToInstall(e.target.value)}
+      >
+        {!gameInfo?.channels
+          ? null
+          : Object.keys(gameInfo.channels).map((p, i) => {
+              if (!gameInfo.channels) return <div>error</div>
+              const channel_i = gameInfo.channels[p]
+              return (
+                <option value={p} key={i}>
+                  {channel_i.displayName}
+                </option>
+              )
+            })}
+      </SelectField>
+    )
+  }
+
   const showDownloadDialog = !isSideload && gameInfo
 
   return (
@@ -209,8 +234,10 @@ export default React.memo(function InstallModal({
             platformToInstall={platformToInstall}
             gameInfo={gameInfo}
             crossoverBottle={crossoverBottle}
+            releaseNameToInstall={releaseNameToInstall}
           >
             {platformSelection()}
+            {runner === 'hyperplay' ? releaseNameSelection() : null}
             {hasWine ? (
               <WineSelector
                 winePrefix={winePrefix}

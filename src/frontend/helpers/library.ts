@@ -26,6 +26,7 @@ type InstallArgs = {
   sdlList?: Array<string>
   installLanguage?: string
   showDialogModal: (options: DialogModalOptions) => void
+  releaseName?: string
 }
 
 async function install({
@@ -40,7 +41,8 @@ async function install({
   installDlcs = false,
   installLanguage = 'en-US',
   platformToInstall = 'Windows',
-  showDialogModal
+  showDialogModal,
+  releaseName
 }: InstallArgs) {
   if (!installPath) {
     return
@@ -112,7 +114,8 @@ async function install({
     installLanguage,
     runner,
     platformToInstall,
-    gameInfo
+    gameInfo,
+    releaseName
   })
 }
 

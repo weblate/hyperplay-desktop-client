@@ -176,12 +176,6 @@ async function downloadGame(
   downloadPath: string,
   platformInfo: PlatformInfo
 ): Promise<void> {
-  const appInfo = getGameInfo(appName)
-
-  if (!appInfo || !appInfo.releaseMeta) {
-    throw new Error('App not found in library')
-  }
-
   logInfo(`Downloading zip file to ${downloadPath}`, LogPrefix.HyperPlay)
 
   // we might need a helper function to deal with the different platforms
@@ -240,17 +234,29 @@ function sanitizeFileName(filename: string) {
 
 export async function install(
   appName: string,
-  { path: dirpath, platformToInstall }: InstallArgs
+  { path: dirpath, platformToInstall, releaseName }: InstallArgs
 ): Promise<InstallResult> {
   if (!existsSync(dirpath) && platformToInstall !== 'Browser') {
     mkdirSync(dirpath, { recursive: true })
   }
 
   const gameInfo = getGameInfo(appName)
-  const { title, releaseMeta } = gameInfo
+  const {
+    title,
+    releaseMeta: releaseMetaDeprecated,
+    releases,
+    channels
+  } = gameInfo
   const window = getMainWindow()
+  if (!window) return { status: 'error', error: 'Window undefined' }
 
-  if (!releaseMeta || !window) {
+  let releaseMeta = releaseMetaDeprecated
+  if (releaseName && releases && channels) {
+    const releaseVersionSelected = channels[releaseName].version
+    releaseMeta = releases[releaseVersionSelected]
+  }
+
+  if (!releaseMeta) {
     return { status: 'error', error: 'Release meta not found' }
   }
 
@@ -260,6 +266,12 @@ export async function install(
   try {
     const appPlatform = handleArchAndPlatform(platformToInstall, releaseMeta)
     const platformInfo = releaseMeta.platforms[appPlatform]
+    if (!platformInfo) {
+      const errStr =
+        'Install failed! Could not find platform info for app platform to install'
+      console.error(errStr)
+      return { status: 'error', error: errStr }
+    }
     const zipName = encodeURI(platformInfo.name)
     const zipFile = path.join(configFolder, zipName)
     const destinationPath = path.join(dirpath, sanitizeFileName(title))

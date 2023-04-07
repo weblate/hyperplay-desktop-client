@@ -11,6 +11,7 @@ import axios from 'axios'
 import { logInfo, LogPrefix, logError, logWarning } from 'backend/logger/logger'
 import { handleArchAndPlatform } from './utils'
 import { getGameInfo as getGamesGameInfo } from './games'
+import testJson from './test.json'
 
 export async function addGameToLibrary(appId: string) {
   const currentLibrary = hpLibraryStore.get('games', [])
@@ -25,11 +26,14 @@ export async function addGameToLibrary(appId: string) {
     return
   }
 
-  const res = await axios.get<HyperPlayRelease[]>(
-    `https://developers.hyperplay.xyz/api/listings?id=${appId}`
-  )
+  let data = testJson as HyperPlayRelease
+  if (appId !== '63f685cd069b92b74c6d5778') {
+    const res = await axios.get<HyperPlayRelease[]>(
+      `https://developers.hyperplay.xyz/api/listings?id=${appId}`
+    )
 
-  const data = res.data[0]
+    data = res.data[0]
+  }
 
   const isWebGame = Object.hasOwn(data.releaseMeta.platforms, 'web')
   const supportedPlatforms = Object.keys(data.releaseMeta.platforms)
@@ -55,7 +59,7 @@ export async function addGameToLibrary(appId: string) {
     runner: 'hyperplay',
     title: data.projectMeta.name,
     art_square: data.projectMeta.image || data.releaseMeta.image,
-    art_cover: data.releaseMeta.image || data.projectMeta.main_capsule,
+    art_cover: data.projectMeta.main_capsule || data.releaseMeta.image,
     is_installed: Boolean(data.releaseMeta.platforms.web),
     cloud_save_enabled: false,
     namespace: '',
@@ -68,11 +72,13 @@ export async function addGameToLibrary(appId: string) {
     canRunOffline: false,
     install: isWebGame ? { platform: 'web' } : {},
     releaseMeta: data.releaseMeta,
-    version: data.releaseName
+    version: data.releaseName,
+    channels: data.channels,
+    releases: data.releases
   }
 
   if (isWebGame) {
-    gameInfo.browserUrl = data.releaseMeta.platforms.web.external_url
+    gameInfo.browserUrl = data.releaseMeta.platforms.web?.external_url
   }
 
   hpLibraryStore.set('games', [...currentLibrary, gameInfo])
@@ -103,8 +109,8 @@ export const getInstallInfo = async (
     )
     return undefined
   }
-  const download_size = info.downloadSize
-  const install_size = info.installSize
+  const download_size = parseInt(info.downloadSize)
+  const install_size = parseInt(info.installSize)
   return {
     game: info,
     manifest: {
