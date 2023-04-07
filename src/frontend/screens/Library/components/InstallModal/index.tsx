@@ -73,7 +73,12 @@ export default React.memo(function InstallModal({
   const [wineVersionList, setWineVersionList] = useState<WineInstallation[]>([])
   const [crossoverBottle, setCrossoverBottle] = useState('')
 
-  const [channelNameToInstall, setChannelNameToInstall] = useState('')
+  const initChannelName =
+    gameInfo?.channels && Object.keys(gameInfo?.channels).length > 0
+      ? Object.keys(gameInfo?.channels)[0]
+      : ''
+  const [channelNameToInstall, setChannelNameToInstall] =
+    useState(initChannelName)
 
   const isLinuxNative = Boolean(gameInfo?.is_linux_native)
   const isMacNative = Boolean(gameInfo?.is_mac_native)

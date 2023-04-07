@@ -13,6 +13,26 @@ import { handleArchAndPlatform } from './utils'
 import { getGameInfo as getGamesGameInfo } from './games'
 import testJson from './test.json'
 
+async function getHyperPlayReleaseMap() {
+  const hpStoreGameReleases = (
+    await axios.get<HyperPlayRelease[]>(
+      'https://developers.hyperplay.xyz/api/listings'
+    )
+  ).data
+  interface hpStoreGameMapType {
+    [key: string]: HyperPlayRelease | undefined
+  }
+  const hpStoreGameMap: hpStoreGameMapType = {}
+
+  hpStoreGameReleases.forEach((val) => {
+    hpStoreGameMap[val._id] = val
+  })
+
+  // TODO: Remove after hp store upgrades to new data structure including channels and releases
+  hpStoreGameMap['63f685cd069b92b74c6d5778'] = testJson
+  return hpStoreGameMap
+}
+
 export async function addGameToLibrary(appId: string) {
   const currentLibrary = hpLibraryStore.get('games', [])
 
@@ -27,6 +47,8 @@ export async function addGameToLibrary(appId: string) {
   }
 
   let data = testJson as HyperPlayRelease
+
+  // TODO: Remove after hp store upgrades to new data structure including channels and releases
   if (appId !== '63f685cd069b92b74c6d5778') {
     const res = await axios.get<HyperPlayRelease[]>(
       `https://developers.hyperplay.xyz/api/listings?id=${appId}`
@@ -167,7 +189,9 @@ export function refreshHPGameInfo(appId: string, data: HyperPlayRelease) {
       data.projectMeta.main_capsule ||
       currentInfo.art_cover,
     releaseMeta: data.releaseMeta,
-    developer: data.accountMeta.name || data.accountName
+    developer: data.accountMeta.name || data.accountName,
+    channels: data.channels,
+    releases: data.releases
   }
   currentLibrary[gameIndex] = gameInfo
   return hpLibraryStore.set('games', currentLibrary)
@@ -186,15 +210,16 @@ const defaultExecResult = {
 export async function refresh() {
   const currentLibrary = hpLibraryStore.get('games', []) as GameInfo[]
   const currentLibraryIds = currentLibrary.map((val) => val.app_name)
-  const data = (
-    await axios.get<HyperPlayRelease[]>(
-      'https://developers.hyperplay.xyz/api/listings'
-    )
-  ).data
+  const hpStoreGameMap = await getHyperPlayReleaseMap()
 
   for (const gameId of currentLibraryIds) {
     try {
-      const gameData = data.find((val) => val._id === gameId)
+      let gameData = hpStoreGameMap[gameId]
+
+      // TODO: Remove after hp store upgrades to new data structure including channels and releases
+      if (gameId === '63f685cd069b92b74c6d5778') {
+        gameData = testJson
+      }
 
       if (!gameData) {
         throw new Error('GameId not find in API')
@@ -219,61 +244,39 @@ export function getGameInfo(
   return undefined
 }
 
-export async function updateAllLibraryReleaseData() {
-  const allListingsResponse = await axios.get(
-    'https://developers.hyperplay.xyz/api/listings'
-  )
-  interface listingMapType {
-    [key: string]: HyperPlayRelease
-  }
-  const listingMap: listingMapType = {}
-  const allListingsRemote = allListingsResponse.data as HyperPlayRelease[]
-
-  allListingsRemote.forEach((element) => {
-    listingMap[element._id] = element
-  })
-
-  const updateableGames: string[] = []
-  const currentHpLibrary = hpLibraryStore.get('games', [])
-  currentHpLibrary.map((localReleaseData, index) => {
-    const remoteReleaseData = listingMap[localReleaseData.app_name]
-    //copy remote data to local release data in library
-    throw 'ERROR updateAllLibraryReleaseData NOT IMPLEMENTED!'
-  })
-}
-
 /* returns array of app names (i.e. _id's) for game releases that are out of date
  * a game's app name is only returned if the game is installed
  * since library release data is updated on each app launch
  */
 export async function listUpdateableGames(): Promise<string[]> {
-  logWarning(`listUpdateableGames not implemented on HyperPlay Library Manager`)
-  const allListingsResponse = await axios.get(
-    'https://developers.hyperplay.xyz/api/listings'
-  )
-  interface listingMapType {
-    [key: string]: HyperPlayRelease
-  }
-  const listingMap: listingMapType = {}
-  const allListingsRemote = allListingsResponse.data as HyperPlayRelease[]
-
-  allListingsRemote.forEach((element) => {
-    listingMap[element._id] = element
-  })
+  const listingMap = await getHyperPlayReleaseMap()
 
   const updateableGames: string[] = []
   const currentHpLibrary = hpLibraryStore.get('games', [])
+
   currentHpLibrary.map((val) => {
     if (val.install.platform === 'web') {
       return
     }
-    if (val.version === undefined) {
-      updateableGames.push(val.app_name)
+
+    if (!gameIsInstalled(val)) return
+
+    // handle the new gameinfo structure with channels and releases
+    if (val.channels && val.install.channelName) {
+      if (!Object.hasOwn(val.channels, val.install.channelName)) {
+        console.error(`
+        Cannot find installed channel name in channels. 
+        The channel name may have been changed by the remote.
+        To continue to receive game updates, uninstall and reinstall this game: ${val.title}`)
+      }
+      if (
+        val.install.version !== val.channels[val.install.channelName].version
+      ) {
+        updateableGames.push(val.app_name)
+      }
     }
-    if (
-      gameIsInstalled(val) &&
-      val.install.version !== listingMap[val.app_name].releaseName
-    ) {
+    // handle the case where gameinfo is still using the deprecated data structure
+    else if (val.install.version !== listingMap[val.app_name]?.releaseName) {
       updateableGames.push(val.app_name)
     }
   })

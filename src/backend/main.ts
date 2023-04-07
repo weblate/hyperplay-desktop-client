@@ -378,7 +378,7 @@ if (!gotTheLock) {
       }
 
       //update metadata for all hp store games in library on launch
-      HyperPlayLibraryManager.updateAllLibraryReleaseData()
+      HyperPlayLibraryManager.refresh()
     })
 
     await i18next.use(Backend).init({
