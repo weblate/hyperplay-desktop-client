@@ -25,6 +25,7 @@ import SideloadDialog from './SideloadDialog'
 import WineSelector from './WineSelector'
 import { SelectField } from 'frontend/components/UI'
 import { useTranslation } from 'react-i18next'
+import { translateReleaseName } from 'frontend/screens/Library/constants'
 
 type Props = {
   appName: string
@@ -206,7 +207,7 @@ export default React.memo(function InstallModal({
               const channel_i = gameInfo.channels[p]
               return (
                 <option value={p} key={i}>
-                  {channel_i.displayName}
+                  {translateReleaseName(channel_i.displayName, t)}
                 </option>
               )
             })}
