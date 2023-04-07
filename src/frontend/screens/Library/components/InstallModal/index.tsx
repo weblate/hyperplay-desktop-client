@@ -25,7 +25,7 @@ import SideloadDialog from './SideloadDialog'
 import WineSelector from './WineSelector'
 import { SelectField } from 'frontend/components/UI'
 import { useTranslation } from 'react-i18next'
-import { translateReleaseName } from 'frontend/screens/Library/constants'
+import { translateChannelName } from 'frontend/screens/Library/constants'
 
 type Props = {
   appName: string
@@ -73,7 +73,7 @@ export default React.memo(function InstallModal({
   const [wineVersionList, setWineVersionList] = useState<WineInstallation[]>([])
   const [crossoverBottle, setCrossoverBottle] = useState('')
 
-  const [releaseNameToInstall, setReleaseNameToInstall] = useState('')
+  const [channelNameToInstall, setChannelNameToInstall] = useState('')
 
   const isLinuxNative = Boolean(gameInfo?.is_linux_native)
   const isMacNative = Boolean(gameInfo?.is_mac_native)
@@ -192,13 +192,13 @@ export default React.memo(function InstallModal({
     )
   }
 
-  function releaseNameSelection() {
+  function channelNameSelection() {
     return (
       <SelectField
-        label={`${t('game.selectReleaseName', 'Select Release Name')}:`}
-        htmlId="releaseNameSelect"
-        value={releaseNameToInstall}
-        onChange={(e) => setReleaseNameToInstall(e.target.value)}
+        label={`${t('game.selectChannelName', 'Select Channel Name')}:`}
+        htmlId="channelNameSelect"
+        value={channelNameToInstall}
+        onChange={(e) => setChannelNameToInstall(e.target.value)}
       >
         {!gameInfo?.channels
           ? null
@@ -207,7 +207,7 @@ export default React.memo(function InstallModal({
               const channel_i = gameInfo.channels[p]
               return (
                 <option value={p} key={i}>
-                  {translateReleaseName(channel_i.displayName, t)}
+                  {translateChannelName(channel_i.displayName, t)}
                 </option>
               )
             })}
@@ -235,10 +235,10 @@ export default React.memo(function InstallModal({
             platformToInstall={platformToInstall}
             gameInfo={gameInfo}
             crossoverBottle={crossoverBottle}
-            releaseNameToInstall={releaseNameToInstall}
+            channelNameToInstall={channelNameToInstall}
           >
             {platformSelection()}
-            {runner === 'hyperplay' ? releaseNameSelection() : null}
+            {runner === 'hyperplay' ? channelNameSelection() : null}
             {hasWine ? (
               <WineSelector
                 winePrefix={winePrefix}

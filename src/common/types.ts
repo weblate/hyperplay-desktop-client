@@ -224,6 +224,7 @@ export interface InstalledInfo {
   language?: string // For verifing GOG games
   versionEtag?: string // Checksum for checking GOG updates
   buildId?: string // For verifing GOG games
+  channel?: string // HP store game channel. Channel to check updates for
 }
 
 export interface Reqs {
@@ -255,7 +256,7 @@ export interface InstallArgs {
   installDlcs?: boolean
   sdlList?: string[]
   installLanguage?: string
-  releaseName?: string
+  channelName?: string
 }
 
 export interface InstallParams extends InstallArgs {
