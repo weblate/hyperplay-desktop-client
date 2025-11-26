@@ -581,7 +581,12 @@
             "show-in-folder": "Logifaili kuvamine kaustas",
             "instructions-part-01": "Kui teil tekib HyperPlay kasutamisel probleeme, on meie Discordi serveris kaks määratud ala probleemide teatamiseks. Kui olete mängija, teatage probleemidest, külastades mängija tugifoorumit. Kui olete mängu arendaja, teatage probleemidest, külastades arendaja tugifoorumit.",
             "join-hyperplay-discord": "Liituge meie Discordiga",
-            "instructions-part-02": "Kuna soovime probleemi võimalikult kiiresti diagnoosida ja lahendada, palun esitage nii palju teavet kui võimalik, sealhulgas koopia oma logidest. Meie tugimeeskond jälgib mõlemat kanalit ja teeb oma parima, et teie probleemile võimalikult kiiresti vastata. Aitäh teie kannatlikkuse ja arusaamise eest, kui töötame probleemide lahendamise nimel, millega võite kokku puutuda."
+            "instructions-part-02": "Kuna soovime probleemi võimalikult kiiresti diagnoosida ja lahendada, palun esitage nii palju teavet kui võimalik, sealhulgas koopia oma logidest. Meie tugimeeskond jälgib mõlemat kanalit ja teeb oma parima, et teie probleemile võimalikult kiiresti vastata. Aitäh teie kannatlikkuse ja arusaamise eest, kui töötame probleemide lahendamise nimel, millega võite kokku puutuda.",
+            "alert-title": "Kuidas saan teatada veast?",
+            "copied-to-clipboard": "Kopeeritud!",
+            "copy-log-clipboard": "Kopeeri logi lõikelauale",
+            "create-ticket-discord": "Koosta veateade",
+            "show-log-folder": "Näita kaustas logifaili"
         },
         "mangohud": "Luba Mangohud (Mangohud tuleb installida)  \nLuba Mangohud (Mangohud on vajalik paigaldada)  \nAktiveeri Mangohud (Mangohud tuleb enne paigaldada)",
         "manualsync": {
@@ -632,7 +637,10 @@
         "autodxvknvapi": "DXVK-NVAPI automaatne installimine ja värskendamine prefiksis",
         "steamId": "Steam ID",
         "dxvkfpslimit": "Piira FPS-i (DX9, 10 ja 11)",
-        "autoLaunchHyperPlay": "Hüpermängu automaatne käivitamine"
+        "autoLaunchHyperPlay": "Hüpermängu automaatne käivitamine",
+        "logs": {
+            "title": "Logid"
+        }
     },
     "settings": {
         "battlEyeRuntime": {
@@ -702,7 +710,8 @@
             "osNameFlatpak": "{{osName}} (Flatpak'i sees)",
             "osVersion": "Versioon {{versionNumber}}"
         },
-        "reset-extension": "Laiendi lähtestamine"
+        "reset-extension": "Laiendi lähtestamine",
+        "default_alert_title": "Vaikimisi seadistused"
     },
     "Settings": "Seadete menüü",
     "sidebar": {
@@ -711,7 +720,9 @@
         "library": "Raamatute teekond",
         "store": "Analüütika on välja lülitatud",
         "achievements": "Saavutused",
-        "downloadManager": "Allalaadimise haldur"
+        "downloadManager": "Allalaadimise haldur",
+        "docs": "Dokumendid",
+        "settings": "Seadistused"
     },
     "status": {
         "installing": "Installeerimise protsess",
@@ -944,7 +955,9 @@
         "linkSteamAccountTitle": "Seosta Steam'i konto",
         "compatibilityLayer": "Ühilduvuse kiht (Beta)",
         "discordAppLink": "Discordi kogukond.",
-        "swapConnectedWallet": "Vaheta ühendatud rahataskut"
+        "swapConnectedWallet": "Vaheta ühendatud rahataskut",
+        "analyticsTurnOff": "Lülita välja",
+        "analyticsTurnOn": "Lülita sisse"
     },
     "gameRelease": {
         "beta": "Beeta test",
@@ -1130,7 +1143,8 @@
         "viewAllQuests": {
             "title": "Vaata kõiki ülesandeid"
         },
-        "quests": "Ülesanded"
+        "quests": "Ülesanded",
+        "search": "Otsi"
     },
     "dlcs": {
         "label": "Vali installimiseks DLC-d:"
